@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mi ami? 💘</title>
+<meta property="og:title" content="Ho una domanda per te... 🥺">
+<meta property="og:description" content="Apri e rispondi sinceramente 💘">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  body {
+    background: linear-gradient(160deg, #ff9a9e 0%, #fad0c4 30%, #fbc2eb 60%, #a18cd1 100%);
+    background-size: 200% 200%;
+    animation: sfondo 8s ease infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  @keyframes sfondo {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Cuoricini che fluttuano sullo sfondo */
+  .cuore-bg {
+    position: fixed;
+    bottom: -10vh;
+    font-size: 24px;
+    opacity: 0.5;
+    animation: sali linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes sali {
+    to { transform: translateY(-120vh) rotate(360deg); }
+  }
+
+  .card {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 40px 24px;
+    max-width: 420px;
+    width: 92%;
+  }
+
+  .emoji {
+    font-size: 96px;
+    display: block;
+    margin-bottom: 24px;
+    animation: batti 1.2s ease-in-out infinite;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+  }
+
+  @keyframes batti {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  h1 {
+    color: #fff;
+    font-size: clamp(28px, 8vw, 42px);
+    font-weight: 800;
+    text-shadow: 0 4px 12px rgba(160, 60, 120, 0.35);
+    margin-bottom: 36px;
+    line-height: 1.25;
+    min-height: 2.5em;
+  }
+
+  .bottoni {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  button {
+    border: none;
+    border-radius: 999px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s ease, font-size 0.25s ease, padding 0.25s ease;
+  }
+
+  #si {
+    background: #fff;
+    color: #e0446e;
+    font-size: 22px;
+    padding: 16px 44px;
+    box-shadow: 0 10px 24px rgba(224, 68, 110, 0.4);
+  }
+
+  #si:active { transform: scale(0.94); }
+
+  #no {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: 20px;
+    padding: 14px 36px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Schermata finale */
+  #finale {
+    display: none;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 24px;
+  }
+
+  #finale .emoji { font-size: 110px; }
+
+  #finale h1 { margin-bottom: 12px; min-height: 0; }
+
+  #finale p {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(160, 60, 120, 0.3);
+  }
+
+  .cuore-esplosione {
+    position: fixed;
+    font-size: 32px;
+    pointer-events: none;
+    z-index: 5;
+    animation: esplodi 1.4s ease-out forwards;
+  }
+
+  @keyframes esplodi {
+    from { transform: translate(0, 0) scale(0.5); opacity: 1; }
+    to   { transform: translate(var(--dx), var(--dy)) scale(1.6); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body, .emoji, .cuore-bg { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="domanda">
+  <span class="emoji" id="faccia">🥺👉👈</span>
+  <h1 id="testo">Mi ami?</h1>
+  <div class="bottoni">
+    <button id="si">Sì ❤️</button>
+    <button id="no">No 💔</button>
+  </div>
+</div>
+
+<div id="finale">
+  <span class="emoji">🥰</span>
+  <h1>LO SAPEVO!!! ❤️</h1>
+  <p>Anch'io ti amo tantissimo! 💘💘💘</p>
+</div>
+
+<script>
+  // ----- Cuoricini di sfondo -----
+  const emojiCuori = ['💗', '💖', '💕', '💘', '❤️', '💝'];
+  for (let i = 0; i < 14; i++) {
+    const c = document.createElement('span');
+    c.className = 'cuore-bg';
+    c.textContent = emojiCuori[i % emojiCuori.length];
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.fontSize = (16 + Math.random() * 26) + 'px';
+    c.style.animationDuration = (6 + Math.random() * 8) + 's';
+    c.style.animationDelay = (Math.random() * 8) + 's';
+    document.body.appendChild(c);
+  }
+
+  // ----- Logica del "No" che scappa -----
+  const si = document.getElementById('si');
+  const no = document.getElementById('no');
+  const testo = document.getElementById('testo');
+  const faccia = document.getElementById('faccia');
+  const domanda = document.getElementById('domanda');
+  const finale = document.getElementById('finale');
+
+  const frasi = [
+    { t: 'Sicuro/a? 🤨', f: '🤨' },
+    { t: 'Sicurissimo/a?? 😳', f: '😳' },
+    { t: 'Ripensaci bene... 🥺', f: '🥺' },
+    { t: 'Ti prego!! 😢', f: '😢' },
+    { t: 'Mi stai spezzando il cuore 💔', f: '😭' },
+    { t: 'Non hai scelta ormai 😌', f: '😌' },
+    { t: 'DEVI dire di sì!! 😤', f: '😤' }
+  ];
+
+  let tentativi = 0;
+
+  function scappa() {
+    // Cambia frase ed emoji
+    const frase = frasi[Math.min(tentativi, frasi.length - 1)];
+    testo.textContent = frase.t;
+    faccia.textContent = frase.f;
+    tentativi++;
+
+    // Il "Sì" cresce, il "No" si rimpicciolisce
+    const crescita = Math.min(tentativi, 8);
+    si.style.fontSize = (22 + crescita * 7) + 'px';
+    si.style.padding = (16 + crescita * 5) + 'px ' + (44 + crescita * 9) + 'px';
+    no.style.fontSize = Math.max(20 - crescita * 2, 9) + 'px';
+    no.style.padding = Math.max(14 - crescita, 6) + 'px ' + Math.max(36 - crescita * 3, 12) + 'px';
+
+    // Dopo qualche tentativo il "No" inizia a scappare
+    if (tentativi >= 3) {
+      no.style.position = 'fixed';
+      const maxX = window.innerWidth - no.offsetWidth - 20;
+      const maxY = window.innerHeight - no.offsetHeight - 20;
+      no.style.left = (20 + Math.random() * maxX) + 'px';
+      no.style.top = (20 + Math.random() * maxY) + 'px';
+    }
+  }
+
+  no.addEventListener('click', scappa);
+  no.addEventListener('touchstart', function (e) {
+    if (tentativi >= 3) { e.preventDefault(); scappa(); }
+  }, { passive: false });
+  no.addEventListener('mouseover', function () {
+    if (tentativi >= 5) scappa();
+  });
+
+  // ----- Vittoria! -----
+  si.addEventListener('click', function () {
+    domanda.style.display = 'none';
+    no.style.display = 'none';
+    finale.style.display = 'block';
+    document.title = 'LO SAPEVO ❤️';
+
+    // Esplosione di cuori
+    let onde = 0;
+    const intervallo = setInterval(function () {
+      for (let i = 0; i < 10; i++) {
+        const cuore = document.createElement('span');
+        cuore.className = 'cuore-esplosione';
+        cuore.textContent = emojiCuori[Math.floor(Math.random() * emojiCuori.length)];
+        cuore.style.left = '50%';
+        cuore.style.top = '50%';
+        cuore.style.setProperty('--dx', (Math.random() * 600 - 300) + 'px');
+        cuore.style.setProperty('--dy', (Math.random() * 600 - 300) + 'px');
+        document.body.appendChild(cuore);
+        setTimeout(() => cuore.remove(), 1400);
+      }
+      if (++onde >= 6) clearInterval(intervallo);
+    }, 350);
+  });
+</script>
+
+</body>
+</html>
